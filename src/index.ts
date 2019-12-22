@@ -7,8 +7,8 @@ import { Store } from 'vuex'
  * 用来描述一个路由模块
  */
 abstract class StreamRouteBlock {
-  private type = 'r'
-  private route!: string
+  public type = 'r'
+  public route!: string
   constructor(route: string) {
     this.route = route
   }
@@ -18,7 +18,7 @@ abstract class StreamRouteBlock {
  * 用来描述一个决策模块
  */
 abstract class StreamDecisionBlock {
-  private type= 'd'
+  public type= 'd'
   constructor() {}
   /**
    * 决策
@@ -48,10 +48,16 @@ class StreamFlow<R = any, S = any> {
      * 创建路由订阅者
      */
     this._routerListener = {
-      next: name => {
+      next: b => {
         try {
           // todo 完成 block 然后 move
-          this.move()
+          console.log(b)
+          if (b instanceof StreamRouteBlock) {
+            this._router.push({
+              name: b.route,
+            })
+            this.move()
+          }
         } catch (error) {}
       },
       error: err => {
@@ -103,3 +109,43 @@ class StreamFlow<R = any, S = any> {
     this._step += s
   }
 }
+
+class entryBlock extends StreamRouteBlock {
+  constructor() {
+    super('entry')
+  }
+}
+
+const vrouter = new VueRouter({
+  mode: 'history',
+  // base: '/flow',
+  routes: [
+    {
+      path: '/entry',
+      name: 'entry',
+    },
+    {
+      path: '/two-factor',
+      name: 'factor',
+    },
+    {
+      path: '/idcard',
+      name: 'idcard',
+    },
+    {
+      path: '/bankcard',
+      name: 'bankcard',
+    },
+    {
+      path: '/home',
+      name: 'home',
+    }
+  ],
+})
+
+const creditFlow = new StreamFlow(vrouter)
+  .push(new entryBlock())
+  .create()
+
+console.log(creditFlow)
+;(window as any).creditFlow = creditFlow
