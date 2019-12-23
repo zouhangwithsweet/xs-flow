@@ -7,43 +7,65 @@ import { Store } from 'vuex'
  * 用来描述一个路由模块
  */
 abstract class StreamRouteBlock {
-  public type = 'r'
-  public route!: string
-  constructor(route: string) {
-    this.route = route
-  }
+  public static type: 'r' = 'r'
+  public static routeName: string
 }
 
 /**
  * 用来描述一个决策模块
  */
-abstract class StreamDecisionBlock {
-  public type= 'd'
-  constructor() {}
+abstract class StreamDecisionBlock<T=any> {
+  public static type: 'd' = 'd'
+  constructor(router?: VueRouter, store?: Store<T>) {}
   /**
    * 决策
    */
-  abstract decide(): Promise<any>
+  public abstract decide(router?: VueRouter, store?: Store<T>): Promise<any>
 }
+
+// class IBlock implements StreamDecisionBlock, StreamRouteBlock {
+//   public decide(router?: VueRouter | undefined, store?: Store<any> | undefined): Promise<any> {
+//     throw new Error("Method not implemented.")
+//   }
+// }
+
+type IBlock = typeof StreamDecisionBlock | typeof StreamRouteBlock
 
 /**
  * flow 类
  * 用来描述一个用户的流程
  */
 class StreamFlow<R = any, S = any> {
-  private _routes: string[] = []
-  private _block: Array<StreamRouteBlock | StreamDecisionBlock> = []
+  // private _routes: string[] = []
+  private _block: Array<IBlock> = []
   private _step = 0
-  private _stream!: Stream<StreamRouteBlock | StreamDecisionBlock>
-  private _producer!: Producer<StreamRouteBlock | StreamDecisionBlock>
+  private _stream!: Stream<IBlock>
+  private _producer!: Producer<IBlock>
   private _router!: VueRouter
   private _store!: Store<S>
-  private _routerListener!: Listener<StreamRouteBlock | StreamDecisionBlock>
-  private _s!: Subscription
+  private _routerListener!: Listener<IBlock>
+  private _decisionListener!: Listener<IBlock>
+  private _s: Subscription[] = []
   public next!: Function
 
   constructor(router: VueRouter, store?: Store<any>) {
     this._router = router
+    store && (this._store = store)
+    /**
+     * 创建决策层
+     */
+    this._decisionListener = {
+      next: b => {
+        if (b.type === 'd') {
+          new (b as any)().decide()
+          this.move()
+        }
+      },
+      error: err => {
+        throw new Error(err)
+      },
+      complete: () => {}
+    }
     /**
      * 创建路由订阅者
      */
@@ -51,10 +73,9 @@ class StreamFlow<R = any, S = any> {
       next: b => {
         try {
           // todo 完成 block 然后 move
-          console.log(b)
-          if (b instanceof StreamRouteBlock) {
+          if ('routeName' in b) {
             this._router.push({
-              name: b.route,
+              name: b.routeName,
             })
             this.move()
           }
@@ -77,7 +98,7 @@ class StreamFlow<R = any, S = any> {
           if (this._block[this._step]) {
             l.next(this._block[this._step])
           } else {
-            this._s.unsubscribe()
+            // this._s.unsubscribe()
           }
         }
       },
@@ -90,7 +111,7 @@ class StreamFlow<R = any, S = any> {
    * 记录需要跳转的路由
    * @param routeName 路由 name
    */
-  public push(block: StreamRouteBlock | StreamDecisionBlock) {
+  public push(block: IBlock) {
     this._block.push(block)
     return this
   }
@@ -99,7 +120,10 @@ class StreamFlow<R = any, S = any> {
    */
   public create() {
     this._stream = xs.create(this._producer)
-    this._s = this._stream.subscribe(this._routerListener)
+    this._s.push(
+      this._stream.subscribe(this._routerListener),
+      this._stream.subscribe(this._decisionListener),
+    )
     return this
   }
   /**
@@ -111,8 +135,16 @@ class StreamFlow<R = any, S = any> {
 }
 
 class entryBlock extends StreamRouteBlock {
+  static routeName = 'entry'
+}
+
+class faceBlock extends StreamDecisionBlock {
+  static type: 'd' = 'd'
   constructor() {
-    super('entry')
+    super()
+  }
+  public async decide(): Promise<any> {
+    console.log('ok')
   }
 }
 
@@ -144,7 +176,8 @@ const vrouter = new VueRouter({
 })
 
 const creditFlow = new StreamFlow(vrouter)
-  .push(new entryBlock())
+  .push(entryBlock)
+  .push(faceBlock)
   .create()
 
 console.log(creditFlow)
