@@ -1,11 +1,13 @@
 {
   "name": "xstream-flow",
   "version": "0.0.1",
-  "description": "xstream-js",
-  "main": "index.ts",
+  "description": "xstream-js,vuex,vue-router",
+  "main": "lib-module/index.js",
+  "module": "lib-module/index.js",
   "scripts": {
     "dev": "poi --serve",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lib": "gulp"
   },
   "author": "zouhang",
   "license": "MIT",
@@ -14,6 +16,9 @@
   },
   "devDependencies": {
     "@poi/plugin-typescript": "^12.2.1",
+    "gulp": "^4.0.2",
+    "gulp-typescript": "^6.0.0-alpha.1",
+    "merge2": "^1.3.0",
     "poi": "^12.7.3",
     "typescript": "^3.7.2",
     "vue": "^2.6.11",
