@@ -23,19 +23,13 @@ abstract class StreamDecisionBlock<T=any> {
   public abstract decide(router?: VueRouter, store?: Store<T>): Promise<any>
 }
 
-// class IBlock implements StreamDecisionBlock, StreamRouteBlock {
-//   public decide(router?: VueRouter | undefined, store?: Store<any> | undefined): Promise<any> {
-//     throw new Error("Method not implemented.")
-//   }
-// }
-
 type IBlock = typeof StreamDecisionBlock | typeof StreamRouteBlock
 
 /**
  * flow 类
  * 用来描述一个用户的流程
  */
-class StreamFlow<R = any, S = any> {
+export default class StreamFlow<R = any, S = any> {
   // private _routes: string[] = []
   private _block: Array<IBlock> = []
   private _step = 0
@@ -55,9 +49,11 @@ class StreamFlow<R = any, S = any> {
      * 创建决策层
      */
     this._decisionListener = {
-      next: b => {
+      next: async b => {
         if (b.type === 'd') {
-          new (b as any)().decide()
+          // this.pendding = true
+          await new (b as any)().decide()
+          // this.pendding = false
           this.move()
         }
       },
@@ -74,7 +70,7 @@ class StreamFlow<R = any, S = any> {
         try {
           // todo 完成 block 然后 move
           if ('routeName' in b) {
-            this._router.push({
+            this._router.replace({
               name: b.routeName,
             })
             this.move()
@@ -133,52 +129,3 @@ class StreamFlow<R = any, S = any> {
     this._step += s
   }
 }
-
-class entryBlock extends StreamRouteBlock {
-  static routeName = 'entry'
-}
-
-class faceBlock extends StreamDecisionBlock {
-  static type: 'd' = 'd'
-  constructor() {
-    super()
-  }
-  public async decide(): Promise<any> {
-    console.log('ok')
-  }
-}
-
-const vrouter = new VueRouter({
-  mode: 'history',
-  // base: '/flow',
-  routes: [
-    {
-      path: '/entry',
-      name: 'entry',
-    },
-    {
-      path: '/two-factor',
-      name: 'factor',
-    },
-    {
-      path: '/idcard',
-      name: 'idcard',
-    },
-    {
-      path: '/bankcard',
-      name: 'bankcard',
-    },
-    {
-      path: '/home',
-      name: 'home',
-    }
-  ],
-})
-
-const creditFlow = new StreamFlow(vrouter)
-  .push(entryBlock)
-  .push(faceBlock)
-  .create()
-
-console.log(creditFlow)
-;(window as any).creditFlow = creditFlow
