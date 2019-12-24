@@ -2,7 +2,7 @@
   "name": "xstream-flow",
   "version": "0.0.1",
   "description": "xstream-js,vuex,vue-router",
-  "main": "lib-module/index.js",
+  "main": "lib/index.js",
   "module": "lib-module/index.js",
   "scripts": {
     "dev": "poi --serve",

@@ -3,6 +3,8 @@
     "target": "esnext",
     "strict": true,
     "module": "es2015",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "declaration": true,
+    "lib": ["es2016", "dom", "es5"]
   }
 }

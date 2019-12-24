@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>vue-test-tpl</title>
+  <script src="https://cdn.jsdelivr.net/npm/xstream@11.11.0/dist/xstream.min.js" integrity="sha256-KjTmahQkOu1xtU8R2hcEdgFflo9u2w1suLlPAYa31Vo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js" integrity="sha256-ngFW3UnAN0Tnm76mDuu7uUtYEcG3G5H1+zioJw3t+68=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js" integrity="sha256-r/vPIUvTobCpYZsMmvU7HM58cNd4D6/vdICqDFapV7Y=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.min.js" integrity="sha256-LfE9mPMjeOg3dTn1sESY2Xvdbq7gAhONtkxacnr7FSA=" crossorigin="anonymous"></script>
+  <script src="../lib/index.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>Hello App!&radic;</h1>
+    <p>
+      <router-link to="/foo">Go to Foo</router-link>
+      <router-link to="/bar">Go to Bar</router-link>
+    </p>
+
+    <router-view></router-view>
+  </div>
+  <script>
+    const Foo = { template: '<div>foo</div>' }
+    const Bar = { template: '<div>bar</div>' }
+
+    const routes = [
+      { path: '/foo', component: Foo },
+      { path: '/bar', component: Bar }
+    ]
+
+    const router = new VueRouter({
+      // mode: 'history',
+      routes,
+    })
+
+    const app = new Vue({
+      router
+    }).$mount('#app')
+  </script>
+</body>
+</html>
