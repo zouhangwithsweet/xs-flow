@@ -22,3 +22,6 @@ Vue.prototype.$xflow = new Xflow(router, store)
   }
 </script>
 ```
+
+##### example
+[hello app](https://zouhangwithsweet.github.io/x-flow/examples/index#/)
