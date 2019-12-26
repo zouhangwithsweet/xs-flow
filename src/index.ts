@@ -52,7 +52,7 @@ export default class StreamFlow<R = any, S = any> {
       next: async b => {
         if (b.type === 'd') {
           // this.pendding = true
-          await new (b as any)().decide()
+          await new (b as any)(router, store).decide()
           // this.pendding = false
           this.move()
         }
@@ -127,5 +127,8 @@ export default class StreamFlow<R = any, S = any> {
    */
   private move(s: 1 | -1 | number = 1) {
     this._step += s
+    if (this._step === this._block.length) {
+      this._s.forEach( s => s.unsubscribe())
+    }
   }
 }

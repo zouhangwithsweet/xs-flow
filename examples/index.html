@@ -5,15 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>vue-test-tpl</title>
-  <script src="https://cdn.jsdelivr.net/npm/xstream@11.11.0/dist/xstream.min.js" integrity="sha256-KjTmahQkOu1xtU8R2hcEdgFflo9u2w1suLlPAYa31Vo=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js" integrity="sha256-ngFW3UnAN0Tnm76mDuu7uUtYEcG3G5H1+zioJw3t+68=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js" integrity="sha256-r/vPIUvTobCpYZsMmvU7HM58cNd4D6/vdICqDFapV7Y=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.min.js" integrity="sha256-LfE9mPMjeOg3dTn1sESY2Xvdbq7gAhONtkxacnr7FSA=" crossorigin="anonymous"></script>
-  <script src="../dist/index.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: 28px;
+    }
+    *::after, *::before {
+      box-sizing: border-box;
+    }
+    #app {
+      padding: 0 16px;
+      font-size: 28px;
+      color: #101010;
+      text-align: center;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mand-mobile@2.5.7/lib-vw/mand-mobile.css" integrity="sha256-ZcmVy+f3nPhKhB9v95ydGCauLIPjfxVnlI1aaFTyRIg=" crossorigin="anonymous">
+  <script>
+    (function(window, document) {
+      function resize () {
+        var ww = window.innerWidth
+        if (ww > window.screen.width) {
+          window.requestAnimationFrame(resize)
+        } else {
+          if (ww > 750) {
+            ww = 750
+          }
+          document.documentElement.style.fontSize = ww * 100 / 750 + 'px'
+        }
+      }
+
+      resize()
+
+      window.addEventListener('resize', resize)
+    })(window, document);
+  </script>
 </head>
 <body>
   <div id="app">
-    <h1>Hello App!</h1>
+    <h4>Hello App!</h4>
     <p>
       <router-link to="/foo">Go to Foo</router-link>
       <router-link to="/bar">Go to Bar</router-link>
@@ -21,25 +53,36 @@
 
     <router-view></router-view>
 
-    <button onclick="window.flow.next()">next</button>
+    <md-button onclick="window.flow.next()" type="primary">next</md-button>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xstream@11.11.0/dist/xstream.min.js" integrity="sha256-KjTmahQkOu1xtU8R2hcEdgFflo9u2w1suLlPAYa31Vo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js" integrity="sha256-ngFW3UnAN0Tnm76mDuu7uUtYEcG3G5H1+zioJw3t+68=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js" integrity="sha256-r/vPIUvTobCpYZsMmvU7HM58cNd4D6/vdICqDFapV7Y=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.min.js" integrity="sha256-LfE9mPMjeOg3dTn1sESY2Xvdbq7gAhONtkxacnr7FSA=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-create-api@0.2.3/dist/vue-create-api.min.js" integrity="sha256-erPCIT0hhzvPm9M+Y8X7Ko29QvkQnh5p0XtWnpeXf+I=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mand-mobile@2.5.7/lib-vw/mand-mobile.umd.min.js"></script>
+  <script src="../dist/index.js"></script>
   <script>
+    Vue.use(VueCreateAPI)
+    Vue.use(window['mand-mobile'])
+    // ------------------------------ 我是分割线 ------------------------------
     const Foo = { template: '<div>foo</div>' }
     const Bar = { template: '<div>bar</div>' }
-
     const routes = [
       { path: '/foo', component: Foo, name: 'foo' },
       { path: '/bar', component: Bar,  name: 'bar' }
     ]
-
     const router = new VueRouter({
-      // mode: 'history',
       routes,
     })
 
     const app = new Vue({
       router
     }).$mount('#app')
+
+    // ------------------------------ 我是分割线 ------------------------------
+
     class foo {
       static type = 'r'
       static routeName = 'foo'
@@ -48,9 +91,21 @@
       static type = 'r'
       static routeName = 'bar'
     }
+
+    function testDecision(router, store) {
+      this.decide = async function() {
+        window['mand-mobile'].Dialog.confirm({
+          title: 'test'
+        })
+      }
+    }
+
+    testDecision.type = 'd'
+
     const flow = new StreamFlow(router)
       .push(foo)
       .push(bar)
+      .push(testDecision)
       .create()
     window.flow = flow
   </script>

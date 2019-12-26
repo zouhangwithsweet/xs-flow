@@ -78,7 +78,7 @@ var StreamFlow = (function (xs) {
                             case 0:
                                 if (!(b.type === 'd')) return [3 /*break*/, 2];
                                 // this.pendding = true
-                                return [4 /*yield*/, new b().decide()
+                                return [4 /*yield*/, new b(router, store).decide()
                                     // this.pendding = false
                                 ];
                             case 1:
@@ -158,6 +158,9 @@ var StreamFlow = (function (xs) {
         StreamFlow.prototype.move = function (s) {
             if (s === void 0) { s = 1; }
             this._step += s;
+            if (this._step === this._block.length) {
+                this._s.forEach(function (s) { return s.unsubscribe(); });
+            }
         };
         return StreamFlow;
     }());
