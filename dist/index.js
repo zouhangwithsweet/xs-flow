@@ -103,9 +103,9 @@ var StreamFlow = (function (xs) {
                 next: function (b) {
                     try {
                         // todo 完成 block 然后 move
-                        if ('routeName' in b) {
+                        if (b.type === 'r') {
                             _this._router.replace({
-                                name: b.routeName,
+                                name: b() || '',
                             });
                             _this.move();
                         }

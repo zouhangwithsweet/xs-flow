@@ -1,25 +1,11 @@
 import VueRouter from 'vue-router';
 import { Store } from 'vuex';
-/**
- * block 类 inspirate by flow
- * 用来描述一个路由模块
- */
-declare abstract class StreamRouteBlock {
-    static type: 'r';
-    static routeName: string;
-}
-/**
- * 用来描述一个决策模块
- */
-declare abstract class StreamDecisionBlock<T = any> {
-    static type: 'd';
-    constructor(router?: VueRouter, store?: Store<T>);
-    /**
-     * 决策
-     */
-    abstract decide(router?: VueRouter, store?: Store<T>): Promise<any>;
-}
-declare type IBlock = typeof StreamDecisionBlock | typeof StreamRouteBlock;
+declare type streamFn<S = any> = ((() => string) & {
+    type: 'r' | 'd';
+}) | (((router?: VueRouter, store?: Store<S>) => void) & {
+    type: 'r' | 'd';
+});
+declare type IBlock = streamFn;
 /**
  * flow 类
  * 用来描述一个用户的流程

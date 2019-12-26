@@ -83,14 +83,22 @@
 
     // ------------------------------ 我是分割线 ------------------------------
 
-    class foo {
-      static type = 'r'
-      static routeName = 'foo'
+    const foo = () => {
+      return 'foo'
     }
-    class bar {
-      static type = 'r'
-      static routeName = 'bar'
+    foo.type = 'r'
+
+    const bar = () => {
+      return 'bar'
     }
+    bar.type = 'r'
+
+    const testD = function(router, store) {
+      this.decide = function() {
+        console.log('ok')
+      }
+    }
+    testD.type = 'd'
 
     function testDecision(router, store) {
       this.decide = async function() {
@@ -106,6 +114,7 @@
       .push(foo)
       .push(bar)
       .push(testDecision)
+      .push(testD)
       .create()
     window.flow = flow
   </script>

@@ -2,28 +2,12 @@ import xs, { Producer, Listener, Stream, Subscription } from 'xstream'
 import VueRouter from 'vue-router'
 import { Store } from 'vuex'
 
-/**
- * block 类 inspirate by flow
- * 用来描述一个路由模块
- */
-abstract class StreamRouteBlock {
-  public static type: 'r' = 'r'
-  public static routeName: string
-}
 
-/**
- * 用来描述一个决策模块
- */
-abstract class StreamDecisionBlock<T=any> {
-  public static type: 'd' = 'd'
-  constructor(router?: VueRouter, store?: Store<T>) {}
-  /**
-   * 决策
-   */
-  public abstract decide(router?: VueRouter, store?: Store<T>): Promise<any>
-}
+type streamFn<S = any> = ((() => string) & {
+  type: 'r' | 'd'
+}) | (((router?: VueRouter, store?: Store<S>) => void) & { type:  'r' | 'd'})
 
-type IBlock = typeof StreamDecisionBlock | typeof StreamRouteBlock
+type IBlock = streamFn
 
 /**
  * flow 类
@@ -69,9 +53,9 @@ export default class StreamFlow<R = any, S = any> {
       next: b => {
         try {
           // todo 完成 block 然后 move
-          if ('routeName' in b) {
+          if (b.type === 'r') {
             this._router.replace({
-              name: b.routeName,
+              name: b() || '',
             })
             this.move()
           }
