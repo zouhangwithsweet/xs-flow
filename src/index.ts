@@ -2,18 +2,18 @@ import xs, { Producer, Listener, Stream, Subscription } from 'xstream'
 import VueRouter, { RouteConfig } from 'vue-router'
 import { Store } from 'vuex'
 
-interface DecideFn<S> {
-  new (router?: VueRouter, store?: Store<S>): this
-  decide():void
-  type: 'd'
+export declare class DecideFn<S = any> {
+  constructor (router?: VueRouter, store?: Store<S>)
+  decide(): Promise<any>
+  static type: 'd'
 }
 type routeName = string
-interface StreamFn {
+export interface StreamFn {
   (): routeName
   type: 'r'
 }
 
-type IBlock<S = any> = StreamFn | DecideFn<S>
+export type IBlock= StreamFn | typeof DecideFn
 
 /**
  * flow 类

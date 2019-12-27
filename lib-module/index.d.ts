@@ -1,16 +1,16 @@
 import VueRouter from 'vue-router';
 import { Store } from 'vuex';
-interface DecideFn<S> {
-    new (router?: VueRouter, store?: Store<S>): this;
-    decide(): void;
-    type: 'd';
+export declare class DecideFn<S = any> {
+    constructor(router?: VueRouter, store?: Store<S>);
+    decide(): Promise<any>;
+    static type: 'd';
 }
 declare type routeName = string;
-interface StreamFn {
+export interface StreamFn {
     (): routeName;
     type: 'r';
 }
-declare type IBlock<S = any> = StreamFn | DecideFn<S>;
+export declare type IBlock = StreamFn | typeof DecideFn;
 /**
  * flow 类
  * 用来描述一个用户的流程
