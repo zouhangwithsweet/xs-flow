@@ -41,13 +41,21 @@ import xs from 'xstream';
  */
 var StreamFlow = /** @class */ (function () {
     function StreamFlow(router, store) {
-        var _this = this;
-        // private _routes: string[] = []
         this._block = [];
         this._step = 0;
         this._s = [];
         this._router = router;
         store && (this._store = store);
+        this.createProducer();
+        this.createListener(router, store);
+    }
+    /**
+     * 生成 listener
+     * @param router
+     * @param store
+     */
+    StreamFlow.prototype.createListener = function (router, store) {
+        var _this = this;
         /**
          * 创建决策层
          */
@@ -57,14 +65,9 @@ var StreamFlow = /** @class */ (function () {
                     switch (_a.label) {
                         case 0:
                             if (!(b.type === 'd')) return [3 /*break*/, 2];
-                            // this.pendding = true
-                            return [4 /*yield*/, new b(router, store).decide()
-                                // this.pendding = false
-                            ];
+                            return [4 /*yield*/, new b(router, store).decide()];
                         case 1:
-                            // this.pendding = true
                             _a.sent();
-                            // this.pendding = false
                             this.move();
                             _a.label = 2;
                         case 2: return [2 /*return*/];
@@ -85,7 +88,7 @@ var StreamFlow = /** @class */ (function () {
                     // todo 完成 block 然后 move
                     if (b.type === 'r') {
                         _this._router.replace({
-                            name: b() || '',
+                            name: b(),
                         });
                         _this.move();
                     }
@@ -97,6 +100,12 @@ var StreamFlow = /** @class */ (function () {
             },
             complete: function () { }
         };
+    };
+    /**
+     * 生成 producer
+     */
+    StreamFlow.prototype.createProducer = function () {
+        var _this = this;
         /**
          * 创建流producer
          */
@@ -118,7 +127,17 @@ var StreamFlow = /** @class */ (function () {
                 console.log('stream 已经没有订阅者');
             }
         };
-    }
+    };
+    /**
+     * 进位或退位
+     */
+    StreamFlow.prototype.move = function (s) {
+        if (s === void 0) { s = 1; }
+        this._step += s;
+        if (this._step === this._block.length) {
+            this._s.forEach(function (s) { return s.unsubscribe(); });
+        }
+    };
     /**
      * 记录需要跳转的路由
      * @param routeName 路由 name
@@ -134,16 +153,6 @@ var StreamFlow = /** @class */ (function () {
         this._stream = xs.create(this._producer);
         this._s.push(this._stream.subscribe(this._routerListener), this._stream.subscribe(this._decisionListener));
         return this;
-    };
-    /**
-     * 进位或退位
-     */
-    StreamFlow.prototype.move = function (s) {
-        if (s === void 0) { s = 1; }
-        this._step += s;
-        if (this._step === this._block.length) {
-            this._s.forEach(function (s) { return s.unsubscribe(); });
-        }
     };
     return StreamFlow;
 }());

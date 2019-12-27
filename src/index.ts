@@ -1,20 +1,25 @@
 import xs, { Producer, Listener, Stream, Subscription } from 'xstream'
-import VueRouter from 'vue-router'
+import VueRouter, { RouteConfig } from 'vue-router'
 import { Store } from 'vuex'
 
+interface DecideFn<S> {
+  new (router?: VueRouter, store?: Store<S>): this
+  decide():void
+  type: 'd'
+}
+type routeName = string
+interface StreamFn {
+  (): routeName
+  type: 'r'
+}
 
-type streamFn<S = any> = ((() => string) & {
-  type: 'r' | 'd'
-}) | (((router?: VueRouter, store?: Store<S>) => void) & { type:  'r' | 'd'})
-
-type IBlock = streamFn
+type IBlock<S = any> = StreamFn | DecideFn<S>
 
 /**
  * flow 类
  * 用来描述一个用户的流程
  */
-export default class StreamFlow<R = any, S = any> {
-  // private _routes: string[] = []
+export default class StreamFlow<S = any> {
   private _block: Array<IBlock> = []
   private _step = 0
   private _stream!: Stream<IBlock>
@@ -26,18 +31,25 @@ export default class StreamFlow<R = any, S = any> {
   private _s: Subscription[] = []
   public next!: Function
 
-  constructor(router: VueRouter, store?: Store<any>) {
+  constructor(router: VueRouter, store?: Store<S>) {
     this._router = router
     store && (this._store = store)
+    this.createProducer()
+    this.createListener(router, store)
+  }
+  /**
+   * 生成 listener
+   * @param router 
+   * @param store 
+   */
+  private createListener(router: VueRouter, store?: Store<S>) {
     /**
      * 创建决策层
      */
     this._decisionListener = {
       next: async b => {
         if (b.type === 'd') {
-          // this.pendding = true
-          await new (b as any)(router, store).decide()
-          // this.pendding = false
+          await new b(router, store).decide()
           this.move()
         }
       },
@@ -55,7 +67,7 @@ export default class StreamFlow<R = any, S = any> {
           // todo 完成 block 然后 move
           if (b.type === 'r') {
             this._router.replace({
-              name: b() || '',
+              name: b(),
             })
             this.move()
           }
@@ -66,6 +78,11 @@ export default class StreamFlow<R = any, S = any> {
       },
       complete: () => {}
     }
+  }
+  /**
+   * 生成 producer
+   */
+  private createProducer() {
     /**
      * 创建流producer
      */
@@ -88,6 +105,15 @@ export default class StreamFlow<R = any, S = any> {
     }
   }
   /**
+   * 进位或退位
+   */
+  private move(s: 1 | -1 | number = 1) {
+    this._step += s
+    if (this._step === this._block.length) {
+      this._s.forEach( s => s.unsubscribe())
+    }
+  }
+  /**
    * 记录需要跳转的路由
    * @param routeName 路由 name
    */
@@ -105,14 +131,5 @@ export default class StreamFlow<R = any, S = any> {
       this._stream.subscribe(this._decisionListener),
     )
     return this
-  }
-  /**
-   * 进位或退位
-   */
-  private move(s: 1 | -1 | number = 1) {
-    this._step += s
-    if (this._step === this._block.length) {
-      this._s.forEach( s => s.unsubscribe())
-    }
   }
 }
