@@ -3,12 +3,12 @@ subscribe user's progress in your webApp (power by vuex, vue-router)
 
 #### how to use
 ```ts
-import Xflow from 'xflow'
+import XsFlow from 'xs-flow'
 import router from 'path/to/router'
 import store from 'path/to/store'
 import someBlocks from 'path/to/blocks'
 
-Vue.prototype.$xflow = new Xflow(router, store)
+Vue.prototype.$xsFlow = new XsFlow(router, store)
   .push(...someBlocks)
   .create()
 ```
@@ -17,7 +17,7 @@ Vue.prototype.$xflow = new Xflow(router, store)
 <script>
   export default {
     someHandler() {
-      this.$xflow.next()
+      this.$xsFlow.next()
     }
   }
 </script>
