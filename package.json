@@ -1,7 +1,7 @@
 {
-  "name": "xstream-flow",
+  "name": "xs-flow",
   "version": "0.0.1",
-  "description": "xstream-js,vuex,vue-router",
+  "description": "xstream-js,vuex,vue-router,react,react-router",
   "main": "lib/index.js",
   "module": "lib-module/index.js",
   "scripts": {
