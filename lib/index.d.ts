@@ -25,8 +25,11 @@ export default class StreamFlow<S = any> {
     private _routerListener;
     private _decisionListener;
     private _s;
+    private _options;
     next: Function;
-    constructor(router: VueRouter, store?: Store<S>);
+    constructor(router: VueRouter, store?: Store<S>, options?: {
+        mode: 'replace' | 'push';
+    });
     /**
      * 生成 listener
      * @param router

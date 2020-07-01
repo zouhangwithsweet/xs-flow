@@ -1,6 +1,6 @@
 {
   "name": "xs-flow",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "xstream-js,vuex,vue-router,react,react-router",
   "main": "lib/index.js",
   "module": "lib-module/index.js",
@@ -10,6 +10,14 @@
     "lib": "gulp && rollup -c",
     "rollup": "rollup -c"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zouhangwithsweet/xs-flow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zouhangwithsweet/xs-flow/issues"
+  },
+  "homepage": "https://github.com/zouhangwithsweet/xs-flow#readme",
   "author": "zouhang",
   "license": "MIT",
   "dependencies": {

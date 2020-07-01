@@ -40,12 +40,14 @@ import xs from 'xstream';
  * 用来描述一个用户的流程
  */
 var StreamFlow = /** @class */ (function () {
-    function StreamFlow(router, store) {
+    function StreamFlow(router, store, options) {
         this._block = [];
         this._step = 0;
         this._s = [];
+        this._options = null;
         this._router = router;
         store && (this._store = store);
+        options && (this._options = options);
         this.createProducer();
         this.createListener(router, store);
     }
@@ -87,9 +89,17 @@ var StreamFlow = /** @class */ (function () {
                 try {
                     // todo 完成 block 然后 move
                     if (b.type === 'r') {
-                        _this._router.replace({
-                            name: b(),
-                        });
+                        if (_this._options) {
+                            var mode = _this._options.mode;
+                            _this._router[mode]({
+                                name: b(),
+                            });
+                        }
+                        else {
+                            _this._router.replace({
+                                name: b(),
+                            });
+                        }
                         _this.move();
                     }
                 }
@@ -118,13 +128,10 @@ var StreamFlow = /** @class */ (function () {
                     if (_this._block[_this._step]) {
                         l.next(_this._block[_this._step]);
                     }
-                    else {
-                        // this._s.unsubscribe()
-                    }
                 };
             },
             stop: function () {
-                console.log('stream 已经没有订阅者');
+                console.log('stream done');
             }
         };
     };

@@ -29,11 +29,15 @@ export default class StreamFlow<S = any> {
   private _routerListener!: Listener<IBlock>
   private _decisionListener!: Listener<IBlock>
   private _s: Subscription[] = []
+  private _options: any = null
   public next!: Function
 
-  constructor(router: VueRouter, store?: Store<S>) {
+  constructor(router: VueRouter, store?: Store<S>, options?: {
+    mode: 'replace' | 'push'
+  }) {
     this._router = router
     store && (this._store = store)
+    options && (this._options = options)
     this.createProducer()
     this.createListener(router, store)
   }
@@ -66,9 +70,16 @@ export default class StreamFlow<S = any> {
         try {
           // todo 完成 block 然后 move
           if (b.type === 'r') {
-            this._router.replace({
-              name: b(),
-            })
+            if (this._options) {
+              const { mode }: { mode: 'replace' | 'push'} = this._options
+              this._router[mode]({
+                name: b(),
+              })
+            } else {
+              this._router.replace({
+                name: b(),
+              })
+            }
             this.move()
           }
         } catch (error) {}
@@ -94,13 +105,11 @@ export default class StreamFlow<S = any> {
         this.next = () => {
           if (this._block[this._step]) {
             l.next(this._block[this._step])
-          } else {
-            // this._s.unsubscribe()
           }
         }
       },
       stop: () => {
-        console.log('stream 已经没有订阅者')
+        console.log('stream done')
       }
     }
   }
