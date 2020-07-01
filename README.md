@@ -26,4 +26,6 @@ Vue.prototype.$xsFlow = new XsFlow(router, store)
 ```
 
 ##### example
-[hello app](https://zouhangwithsweet.github.io/x-flow/examples/index#/)
+> use mobile mode to check it
+
+[hello app](https://zouhangwithsweet.github.io/xs-flow/examples/index#/)
