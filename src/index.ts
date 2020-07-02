@@ -16,6 +16,21 @@ export interface StreamFn {
 export type IBlock= StreamFn | typeof DecideFn
 
 /**
+ * block 包装器
+ * @param params 
+ */
+export const wrapper = (params: string | Function) => {
+  if (typeof params === 'string') {
+    return () => params
+  }
+  if (typeof params === 'function') {
+    return function(this: any, router?: VueRouter, store?: Store<any>) {
+      this.decide = params.bind(null, router, store)
+    }
+  }
+}
+
+/**
  * flow 类
  * 用来描述一个用户的流程
  */
@@ -29,11 +44,15 @@ export default class StreamFlow<S = any> {
   private _routerListener!: Listener<IBlock>
   private _decisionListener!: Listener<IBlock>
   private _s: Subscription[] = []
-  private _options: any = null
+  private _options: null | {
+    mode: 'replace' | 'push',
+    callBack?: Function
+  } = null
   public next!: Function
 
   constructor(router: VueRouter, store?: Store<S>, options?: {
-    mode: 'replace' | 'push'
+    mode: 'replace' | 'push',
+    callback?: Function
   }) {
     this._router = router
     store && (this._store = store)
@@ -71,7 +90,7 @@ export default class StreamFlow<S = any> {
           // todo 完成 block 然后 move
           if (b.type === 'r') {
             if (this._options) {
-              const { mode }: { mode: 'replace' | 'push'} = this._options
+              const { mode } = this._options
               this._router[mode]({
                 name: b(),
               })
@@ -109,7 +128,10 @@ export default class StreamFlow<S = any> {
         }
       },
       stop: () => {
-        console.log('stream done')
+        if (this._options) {
+          const { callBack } = this._options
+          callBack && callBack()
+        }
       }
     }
   }

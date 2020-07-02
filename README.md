@@ -1,9 +1,9 @@
 
 ## xs-flow
 ![npm](https://img.shields.io/npm/v/xs-flow)  
-subscribe user's progress in your webApp (power by vuex, vue-router)
+subscribe user's progress in your webApp (power by xstream, base on vuex & vue-router)
 
-#### how to use
+### How to use
 ```ts
 import XsFlow from 'xs-flow'
 import router from 'path/to/router'
@@ -25,7 +25,7 @@ Vue.prototype.$xsFlow = new XsFlow(router, store)
 </script>
 ```
 
-##### example
+### Example
 > use mobile mode to check it
 
 [hello app](https://zouhangwithsweet.github.io/xs-flow/examples/index#/)

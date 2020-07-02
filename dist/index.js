@@ -151,7 +151,10 @@ var StreamFlow = (function (xs) {
                     };
                 },
                 stop: function () {
-                    console.log('stream done');
+                    if (_this._options) {
+                        var callBack = _this._options.callBack;
+                        callBack && callBack();
+                    }
                 }
             };
         };
