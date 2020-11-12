@@ -1,6 +1,6 @@
 
 ## xs-flow
-![npm](https://img.shields.io/npm/v/xs-flow)  
+![npm](https://img.shields.io/npm/v/xs-flow) ![npm](https://img.shields.io/npm/dw/xs-flow)  
 subscribe user's progress in your webApp (power by xstream, base on vuex & vue-router)
 
 ### How to use
